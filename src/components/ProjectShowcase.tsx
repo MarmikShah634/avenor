@@ -84,6 +84,21 @@ export default function ProjectShowcase() {
     setSelectedProject(PROJECTS[idx]);
   };
 
+  // Close video modal with Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedProject(null);
+      }
+    };
+    if (selectedProject) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedProject]);
+
   useEffect(() => {
     const track = trackRef.current;
     const viewport = viewportRef.current;
@@ -273,7 +288,12 @@ export default function ProjectShowcase() {
     });
 
     cards.forEach((c, i) => {
-      c.addEventListener("click", () => {
+      c.addEventListener("click", (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        // Do not open video popup or rotate card when clicking interactive buttons
+        if (target.closest("a") || target.closest("button") || target.closest(".c-btn")) {
+          return;
+        }
         if (i === activeI) {
           onCardClickRef.current?.(i);
           return;
