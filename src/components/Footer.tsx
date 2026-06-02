@@ -110,6 +110,30 @@ export default function Footer() {
               </a>
             </div>
 
+            <div className="flex flex-col gap-3">
+              <span className="font-mono text-[8px] text-zinc-600 uppercase tracking-widest font-bold">
+                // CONNECT
+              </span>
+              
+              <a 
+                href="https://github.com/MarmikShah634" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-sans font-light text-zinc-400 hover:text-[#e2b853] transition-colors"
+              >
+                GitHub
+              </a>
+              
+              <a 
+                href="https://www.linkedin.com/in/marmik-shah-81bb96294" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-sans font-light text-zinc-400 hover:text-[#e2b853] transition-colors"
+              >
+                LinkedIn
+              </a>
+            </div>
+
           </div>
 
         </div>
