@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Google Sans", "Product Sans", "Outfit", sans-serif;
+  --font-mono: "Space Grotesk", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+
+  --color-bg-dark: #09090b;
+  --color-card-dark: #121216;
+  --color-brand-gold: #e2b853;
+  --color-brand-gold-glow: rgba(226, 184, 83, 0.15);
+  --color-brand-indigo: #6366f1;
+  --color-brand-indigo-glow: rgba(99, 102, 241, 0.15);
+  --color-brand-teal: #14b8a6;
+  --color-brand-teal-glow: rgba(20, 184, 166, 0.15);
+}
+
+/* Custom base animations and micro-interactions */
+@layer base {
+  html {
+    scroll-behavior: initial; /* Handled smoothly by Lenis */
+    background-color: #09090b;
+    color: #f4f4f5;
+  }
+
+  body {
+    overflow-x: hidden;
+    background-color: transparent !important;
+    color: #f4f4f5;
+  }
+
+  /* Sophisticated custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #09090b;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 9999px;
+    transition: background 0.3s ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #e2b853;
+  }
+}
+
+/* Custom premium styling classes */
+@utility glass-card {
+  background: rgba(18, 18, 22, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+@utility glass-card-hover {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  &:hover {
+    background: rgba(25, 25, 30, 0.8);
+    border-color: rgba(226, 184, 83, 0.2);
+    box-shadow: 0 12px 40px 0 rgba(226, 184, 83, 0.05);
+    transform: translateY(-4px);
+  }
+}
+
+@utility text-glow-gold {
+  text-shadow: 0 0 12px rgba(226, 184, 83, 0.3);
+}
+
+@utility text-glow-indigo {
+  text-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+}
+
+@utility bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes cflt {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -9px, 0); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.05); }
+}
+
+@utility animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@utility animate-pulse-slow {
+  animation: pulse-slow 8s ease-in-out infinite;
+}
+
+/* Hide default cursor on desktop to let our kinetic pointer shine */
+@media (min-width: 768px) {
+  html, body, a, button, .c-card, .cs-dot, .glass-card, input, textarea {
+    cursor: none !important;
+  }
+}
+
