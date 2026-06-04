@@ -41,7 +41,12 @@ export default function Navigation({ onContactClick }: NavigationProps) {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 px-6 sm:px-12 py-5 ${
+        style={{
+          transitionProperty: "padding, background-color, border-color, backdrop-filter, -webkit-backdrop-filter",
+          transitionDuration: "500ms",
+          transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)"
+        }}
+        className={`fixed top-0 left-0 w-full z-50 px-6 sm:px-12 py-5 ${
           scrolled 
             ? 'backdrop-blur-md bg-zinc-950/40 border-b border-white/5 py-4' 
             : 'bg-transparent py-6'
