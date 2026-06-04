@@ -34,7 +34,7 @@ function getCameraState(p: number) {
   
   // Find active keyframe segment
   let i = 0;
-  for (i = 0; i < keyframes.length - 1; i++) {
+  for (; i < keyframes.length - 1; i++) {
     if (progress <= keyframes[i + 1].p) break;
   }
   

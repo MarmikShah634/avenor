@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, X, Play } from "lucide-react";
+import { createPortal } from "react-dom";
+import { ExternalLink, X, Play, ArrowRight } from "lucide-react";
 
 const GithubIcon = ({ size }: { size: number }) => (
   <svg
@@ -23,6 +24,12 @@ const PROJECTS = [
     stacks: ["React", "Vite", "TypeScript", "FastAPI", "Python"],
     name: "ZipLens",
     desc: "Convert ZIP files into clean, AI-friendly Markdown documents while preserving folder structure, enabling seamless project sharing, documentation, and code analysis without manual extraction.",
+    features: [
+      "Preserves complete folder hierarchy in the generated Markdown",
+      "Optimizes code formatting for LLM context windows",
+      "Drag-and-drop web interface with local browser processing",
+      "Real-time token count estimation for AI prompt planning",
+    ],
     floatDelay: "0s",
     floatDur: "3.4s",
     githubUrl:
@@ -36,6 +43,12 @@ const PROJECTS = [
     stacks: ["React", "TailwindCSS", "Node.js", "Docker", "Gemini AI"],
     name: "GitGuru",
     desc: "AI-powered Git sandbox that generates real-world Git scenarios inside isolated Docker environments, helping developers safely practice merges, rebases, reflog recovery, and advanced workflows.",
+    features: [
+      "Real-time dynamic visualization of the Git commit tree",
+      "Interactive terminal running inside sandboxed Docker containers",
+      "AI-driven scenario builder powered by Gemini",
+      "Built-in verification engine for conflict resolution checks",
+    ],
     floatDelay: "0s",
     floatDur: "3.4s",
     githubUrl: "https://github.com/MarmikShah634/gitguru",
@@ -48,11 +61,20 @@ const PROJECTS = [
     stacks: ["React", "Vite", "FastAPI", "Docker", "SQL"],
     name: "ChartGenie",
     desc: "Full-stack data visualization platform that transforms CSV files and SQL query results into interactive charts, with project management, chart customization, and exportable code generation.",
+    features: [
+      "Interactive custom chart builder (axes, legends, color schemes)",
+      "Direct CSV imports and remote SQL database connections",
+      "Exportable chart components (React + D3 & Python scripts)",
+      "Project dashboards with saved visualization sharing",
+    ],
     floatDelay: "0s",
     floatDur: "3.4s",
-    githubUrl: "https://github.com/MarmikShah634/ChartGenie",
-    liveUrl: "",
-    demoAvailable: false,
+    githubUrl: {
+      frontend: "https://github.com/MarmikShah634/chartgenie-frontend",
+      backend: "https://github.com/MarmikShah634/chartgenie-backend",
+    },
+    liveUrl: "https://chartgenie.netlify.app/",
+    demoAvailable: true,
     imageUrl: "/images/chartgenie_thumbnail.png",
     videoUrl: "/videos/chartGenie.mp4",
   },
@@ -60,6 +82,12 @@ const PROJECTS = [
     stacks: ["React", "Vite", "FastAPI", "WebSockets", "Docker"],
     name: "NexusDrop",
     desc: "Secure real-time file sharing platform that enables one-time transfers through temporary rooms, leveraging WebSockets for direct delivery and automatic session expiration for enhanced privacy.",
+    features: [
+      "Peer-to-peer real-time file signalling using WebSockets",
+      "One-time ephemeral data rooms with automated auto-destruct timers",
+      "Transfer queue monitor with pause/resume functionality",
+      "Zero server storage requirements preserving files locally",
+    ],
     floatDelay: "0s",
     floatDur: "3.4s",
     githubUrl:
@@ -71,8 +99,29 @@ const PROJECTS = [
   },
 ];
 
+interface Project {
+  stacks: string[];
+  name: string;
+  desc: string;
+  features?: string[];
+  floatDelay: string;
+  floatDur: string;
+  githubUrl: string | { frontend: string; backend: string };
+  liveUrl: string;
+  demoAvailable: boolean;
+  imageUrl: string;
+  videoUrl: string;
+}
+
+type LenisWindow = Window & typeof globalThis & {
+  lenis?: {
+    stop: () => void;
+    start: () => void;
+  };
+};
+
 export default function ProjectShowcase() {
-  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const dotsRef = useRef<HTMLDivElement>(null);
@@ -80,11 +129,13 @@ export default function ProjectShowcase() {
 
   // Bridge direct DOM clicks to React states
   const onCardClickRef = useRef<(idx: number) => void>(null);
-  onCardClickRef.current = (idx: number) => {
-    setSelectedProject(PROJECTS[idx]);
-  };
+  useEffect(() => {
+    onCardClickRef.current = (idx: number) => {
+      setSelectedProject(PROJECTS[idx]);
+    };
+  }, []);
 
-  // Close video modal with Escape key
+  // Close video modal with Escape key and toggle body scroll locking
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -93,9 +144,19 @@ export default function ProjectShowcase() {
     };
     if (selectedProject) {
       window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      (window as LenisWindow).lenis?.stop();
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      (window as LenisWindow).lenis?.start();
     }
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      (window as LenisWindow).lenis?.start();
     };
   }, [selectedProject]);
 
@@ -291,7 +352,11 @@ export default function ProjectShowcase() {
       c.addEventListener("click", (e: MouseEvent) => {
         const target = e.target as HTMLElement;
         // Do not open video popup or rotate card when clicking interactive buttons
-        if (target.closest("a") || target.closest("button") || target.closest(".c-btn")) {
+        if (
+          target.closest("a") ||
+          target.closest("button") ||
+          target.closest(".c-btn")
+        ) {
           return;
         }
         if (i === activeI) {
@@ -332,7 +397,7 @@ export default function ProjectShowcase() {
     <section
       id="showcases"
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col justify-center items-center px-6 sm:px-12 z-10 bg-transparent pt-28 pb-28 sm:pt-36 sm:pb-36 overflow-hidden select-none"
+      className={`relative min-h-screen flex flex-col justify-center items-center px-6 sm:px-12 bg-transparent pt-28 pb-28 sm:pt-36 sm:pb-36 overflow-hidden select-none transition-all duration-300 ${selectedProject ? "z-50" : "z-10"}`}
     >
       {/* 3D Variables definition local scoping */}
       <div
@@ -527,7 +592,11 @@ export default function ProjectShowcase() {
                             }}
                             className="c-play-btn"
                           >
-                            <Play size={18} fill="currentColor" className="ml-0.5" />
+                            <Play
+                              size={18}
+                              fill="currentColor"
+                              className="ml-0.5"
+                            />
                           </div>
                           <span
                             style={{
@@ -650,12 +719,12 @@ export default function ProjectShowcase() {
                             pointerEvents: "none",
                           }}
                         >
-                          <a
-                            href={p.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="c-btn c-btn-git"
-                            onClick={(e) => e.stopPropagation()}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedProject(p);
+                            }}
+                            className="c-btn c-btn-explore"
                             style={{
                               flex: 1,
                               display: "inline-flex",
@@ -666,17 +735,16 @@ export default function ProjectShowcase() {
                               fontSize: 10,
                               fontWeight: 600,
                               letterSpacing: "0.03em",
-                              color: "var(--fg)",
-                              border: "1px solid var(--br)",
+                              color: "var(--bg)",
                               borderRadius: 8,
                               padding: "6px 8px",
-                              background: "rgba(255, 255, 255, 0.02)",
-                              transition: "all .25s ease-out",
+                              background: "var(--ac)",
+                              cursor: "pointer",
                             }}
                           >
-                            <GithubIcon size={11} />
-                            Code
-                          </a>
+                            Explore
+                            <ArrowRight size={11} />
+                          </button>
 
                           {p.demoAvailable && (
                             <a
@@ -695,11 +763,11 @@ export default function ProjectShowcase() {
                                 fontSize: 10,
                                 fontWeight: 600,
                                 letterSpacing: "0.03em",
-                                color: "var(--bg)",
+                                color: "var(--ac)",
+                                border: "1px solid rgba(226, 184, 83, 0.25)",
                                 borderRadius: 8,
                                 padding: "6px 8px",
-                                background: "var(--ac)",
-                                transition: "all .25s ease-out",
+                                background: "rgba(226, 184, 83, 0.03)",
                               }}
                             >
                               <ExternalLink size={11} />
@@ -848,56 +916,168 @@ export default function ProjectShowcase() {
       </div>
 
       {/* Cinematic Video Popup Modal */}
-      <AnimatePresence>
-        {selectedProject && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop Blur */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedProject(null)}
-              className="absolute inset-0 bg-black/85 backdrop-blur-md"
-            />
-
-            {/* Modal Body */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                "--ac": "#e2b853",
-                "--br": "rgba(255, 255, 255, 0.08)",
-                width: "100%",
-                maxWidth: "960px",
-                aspectRatio: "16/9",
-              } as React.CSSProperties}
-              className="relative bg-[#121216]/95 border border-white/10 rounded-3xl overflow-hidden shadow-2xl z-10 flex flex-col justify-center items-center"
+      {createPortal(
+        <AnimatePresence>
+          {selectedProject && (
+            <div
+              className="fixed inset-0 z-40 flex items-start justify-center p-4 pt-24 md:pt-28 overflow-y-auto"
+              data-lenis-prevent
             >
-              {/* Close Button */}
-              <button
+              {/* Backdrop Blur */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 onClick={() => setSelectedProject(null)}
-                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full border border-white/10 bg-black/60 text-zinc-400 flex items-center justify-center hover:text-[var(--ac)] hover:border-[var(--ac)] transition-all cursor-pointer"
-                aria-label="Close details"
-              >
-                <X size={18} />
-              </button>
-
-              {/* HTML5 Video Player with Controls */}
-              <video
-                src={selectedProject.videoUrl}
-                poster={selectedProject.imageUrl}
-                loop
-                controls
-                playsInline
-                autoPlay
-                className="w-full h-full object-contain bg-black"
+                className="absolute inset-0 bg-black/85 backdrop-blur-md"
               />
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+
+              {/* Modal Body */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                style={
+                  {
+                    "--ac": "#e2b853",
+                    "--br": "rgba(255, 255, 255, 0.08)",
+                    width: "100%",
+                    maxWidth: "1024px",
+                  } as React.CSSProperties
+                }
+                className="relative bg-[#121216]/95 border border-white/10 rounded-3xl overflow-hidden shadow-2xl z-10 flex flex-col md:flex-row h-auto md:h-[580px] max-h-[90vh] md:max-h-none"
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full border border-white/10 bg-black/60 text-zinc-400 flex items-center justify-center hover:text-[var(--ac)] hover:border-[var(--ac)] transition-all cursor-pointer"
+                  aria-label="Close details"
+                >
+                  <X size={18} />
+                </button>
+
+                {/* Left: Video Preview with controls */}
+                <div className="w-full md:w-[60%] lg:w-[65%] h-[240px] sm:h-[320px] md:h-full bg-black relative flex items-center justify-center">
+                  <video
+                    src={selectedProject.videoUrl}
+                    poster={selectedProject.imageUrl}
+                    loop
+                    controls
+                    playsInline
+                    autoPlay
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+
+                {/* Right: Info/Details panel */}
+                <div className="w-full md:w-[40%] lg:w-[35%] h-auto md:h-full p-6 sm:p-8 flex flex-col justify-between overflow-y-auto custom-scroll border-t md:border-t-0 md:border-l border-white/10 bg-[#0d0d10]/40 backdrop-blur-sm">
+                  <div className="flex flex-col gap-5">
+                    {/* Title & Stacks */}
+                    <div>
+                      <h3 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight leading-tight">
+                        {selectedProject.name}
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        {selectedProject.stacks.map((stack: string) => (
+                          <span
+                            key={stack}
+                            className="font-mono text-[9px] uppercase tracking-wider text-[var(--ac)] bg-[var(--ac)]/5 border border-[var(--ac)]/15 px-2.5 py-0.5 rounded-full"
+                          >
+                            {stack}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Key Highlights */}
+                    {selectedProject.features && (
+                      <div>
+                        <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-3">
+                          Key Features
+                        </h4>
+                        <ul className="flex flex-col gap-2.5">
+                          {selectedProject.features.map(
+                            (feat: string, idx: number) => (
+                              <li
+                                key={idx}
+                                className="flex items-start gap-2.5 text-xs text-zinc-300 font-light leading-relaxed"
+                              >
+                                <span className="text-[var(--ac)] mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[var(--ac)]" />
+                                <span>{feat}</span>
+                              </li>
+                            ),
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* References */}
+                  <div className="flex flex-col gap-3 mt-6 pt-6 border-t border-white/5">
+                    <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-500 mb-1">
+                      Project References
+                    </h4>
+
+                    {/* Github Links */}
+                    {typeof selectedProject.githubUrl === "string" ? (
+                      <a
+                        href={selectedProject.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2.5 font-sans text-[11px] font-semibold tracking-wide text-white border border-white/15 bg-white/5 hover:bg-white/10 hover:border-white/30 rounded-xl py-3 px-4 transition-all duration-200 shadow-md cursor-pointer"
+                      >
+                        <GithubIcon size={14} />
+                        Codebase
+                      </a>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        {selectedProject.githubUrl?.frontend && (
+                          <a
+                            href={selectedProject.githubUrl.frontend}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-2.5 font-sans text-[11px] font-semibold tracking-wide text-white border border-white/15 bg-white/5 hover:bg-white/10 hover:border-white/30 rounded-xl py-2.5 px-4 transition-all duration-200 shadow-md cursor-pointer"
+                          >
+                            <GithubIcon size={14} />
+                            Frontend Codebase
+                          </a>
+                        )}
+                        {selectedProject.githubUrl?.backend && (
+                          <a
+                            href={selectedProject.githubUrl.backend}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-2.5 font-sans text-[11px] font-semibold tracking-wide text-white border border-white/15 bg-white/5 hover:bg-white/10 hover:border-white/30 rounded-xl py-2.5 px-4 transition-all duration-200 shadow-md cursor-pointer"
+                          >
+                            <GithubIcon size={14} />
+                            Backend Codebase
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Live Demo CTA */}
+                    {selectedProject.demoAvailable &&
+                      selectedProject.liveUrl && (
+                        <a
+                          href={selectedProject.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2.5 font-sans text-[11px] font-bold tracking-wide text-black bg-[var(--ac)] hover:bg-[#f5d170] rounded-xl py-3 px-4 transition-all duration-200 shadow-lg shadow-[var(--ac)]/10 cursor-pointer"
+                        >
+                          <ExternalLink size={14} />
+                          Launch Live Demo
+                        </a>
+                      )}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
 
       {/* Dynamic styles */}
       <style>{`
@@ -948,8 +1128,16 @@ export default function ProjectShowcase() {
           transform: translateY(0) !important;
           pointer-events: auto !important;
         }
+        .c-btn {
+          cursor: pointer;
+          transition: all .25s ease-out;
+        }
         .c-btn:hover {
           transform: translateY(-2px);
+        }
+        .c-btn-explore:hover {
+          background: #f5d170 !important;
+          box-shadow: 0 4px 15px rgba(226, 184, 83, 0.35);
         }
         .c-btn-git:hover {
           background: rgba(255, 255, 255, 0.08) !important;
@@ -957,8 +1145,9 @@ export default function ProjectShowcase() {
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         .c-btn-demo:hover {
-          background: #f5d170 !important;
-          box-shadow: 0 4px 12px rgba(226, 184, 83, 0.25);
+          background: rgba(226, 184, 83, 0.08) !important;
+          border-color: rgba(226, 184, 83, 0.5) !important;
+          box-shadow: 0 4px 12px rgba(226, 184, 83, 0.15);
         }
         
         @media (max-width: 640px) {

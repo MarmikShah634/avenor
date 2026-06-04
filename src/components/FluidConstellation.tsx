@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -64,7 +64,7 @@ export default function FluidConstellation({ sharedStateRef }: FluidConstellatio
   
   // SYSTEM A: Main Spiral Galaxy (8,500 particles)
   const starCount = 8500;
-  const [starPositions, starOriginalPositions, starRandomFactor, starColors] = useMemo(() => {
+  const [starData] = useState(() => {
     const positions = new Float32Array(starCount * 3);
     const originalPositions = new Float32Array(starCount * 3);
     const randomFactor = new Float32Array(starCount);
@@ -123,11 +123,12 @@ export default function FluidConstellation({ sharedStateRef }: FluidConstellatio
     }
 
     return [positions, originalPositions, randomFactor, colors];
-  }, []);
+  });
+  const [starPositions, starOriginalPositions, starRandomFactor, starColors] = starData;
 
   // SYSTEM B: Volumetric Gas Nebulae Clouds (1,200 large points)
   const nebulaCount = 1200;
-  const [nebulaPositions, nebulaOriginalPositions, nebulaRandomFactor, nebulaColors] = useMemo(() => {
+  const [nebulaData] = useState(() => {
     const positions = new Float32Array(nebulaCount * 3);
     const originalPositions = new Float32Array(nebulaCount * 3);
     const randomFactor = new Float32Array(nebulaCount);
@@ -150,7 +151,7 @@ export default function FluidConstellation({ sharedStateRef }: FluidConstellatio
       const x = Math.cos(angle) * (distance + randomRadiusOffset);
       const z = Math.sin(angle) * (distance + randomRadiusOffset);
       
-      // Much thicker vertical bounds for volumetric cloud depth
+      // Much thicker vertical bounds for Volumetric cloud depth
       const verticalBound = 0.85 * (5.6 - distance) * Math.pow(Math.random(), 1.0);
       const y = (Math.random() - 0.5) * verticalBound;
 
@@ -180,11 +181,12 @@ export default function FluidConstellation({ sharedStateRef }: FluidConstellatio
     }
 
     return [positions, originalPositions, randomFactor, colors];
-  }, []);
+  });
+  const [nebulaPositions, nebulaOriginalPositions, nebulaRandomFactor, nebulaColors] = nebulaData;
 
   // SYSTEM C: Hyperdrive Warp Streaks (250 camera-proximal particles)
   const streakCount = 250;
-  const [streakPositions, streakSpeed] = useMemo(() => {
+  const [streakData] = useState(() => {
     const positions = new Float32Array(streakCount * 3);
     const speed = new Float32Array(streakCount);
 
@@ -198,9 +200,10 @@ export default function FluidConstellation({ sharedStateRef }: FluidConstellatio
     }
 
     return [positions, speed];
-  }, []);
+  });
+  const [streakPositions, streakSpeed] = streakData;
 
-  const streakColors = useMemo(() => {
+  const [streakColors] = useState(() => {
     const colors = new Float32Array(streakCount * 3);
     const tempColor = new THREE.Color();
     for (let i = 0; i < streakCount; i++) {
@@ -211,7 +214,7 @@ export default function FluidConstellation({ sharedStateRef }: FluidConstellatio
       colors[i * 3 + 2] = col.b;
     }
     return colors;
-  }, []);
+  });
 
   // --- Real-time Particle Physics & Animation Loop ---
   useFrame((state) => {

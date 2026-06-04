@@ -36,6 +36,9 @@ export default function App() {
       infinite: false
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).lenis = lenis;
+
     const raf = (time: number) => {
       lenis.raf(time);
       requestAnimationFrame(raf);
@@ -44,6 +47,8 @@ export default function App() {
     requestAnimationFrame(raf);
 
     return () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).lenis = undefined;
       lenis.destroy();
     };
   }, [loading]);
