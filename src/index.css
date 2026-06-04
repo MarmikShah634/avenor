@@ -67,11 +67,11 @@
 }
 
 @utility text-glow-gold {
-  text-shadow: 0 0 12px rgba(226, 184, 83, 0.3);
+  filter: drop-shadow(0 0 12px rgba(226, 184, 83, 0.3));
 }
 
 @utility text-glow-indigo {
-  text-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+  filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.3));
 }
 
 @utility bg-grid-pattern {

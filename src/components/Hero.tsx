@@ -39,8 +39,10 @@ export default function Hero({ onContactClick }: HeroProps) {
       <div className="z-10 text-center max-w-4xl w-full flex flex-col items-center mb-10">
         <h1 className="font-display text-4xl sm:text-7xl font-extrabold uppercase tracking-tight leading-[1.05] text-[#f4f4f5] select-none">
           WE BUILD DIGITAL <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e2b853] via-indigo-300 to-teal-400 text-glow-indigo">
-            PRODUCTS WITH PRECISION
+          <span className="text-glow-indigo">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e2b853] via-indigo-300 to-teal-400">
+              PRODUCTS WITH PRECISION
+            </span>
           </span>
         </h1>
         
