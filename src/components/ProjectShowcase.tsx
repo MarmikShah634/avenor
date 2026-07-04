@@ -97,6 +97,24 @@ const PROJECTS = [
     imageUrl: "/images/nexusdrop_thumbnail.png",
     videoUrl: "/videos/nexusDrop.mp4",
   },
+  {
+    stacks: ["JavaScript", "WebExtensions API", "HTML5", "CSS3"],
+    name: "Universal Input Assistant",
+    desc: "A productivity-focused Firefox extension designed to create, manage, and instantly insert custom text snippets and dynamic templates into any web input field, fully integrated with Firefox's secure storage sync.",
+    features: [
+      "Smart auto-detection of snippet types (email, phone, address, and templates)",
+      "Dynamic template engine supporting custom {{variable}} placeholders",
+      "Cross-device synchronization using Firefox Storage Sync with local storage fallback",
+      "Drag-and-drop organization with real-time search, tagging, and type filtering",
+    ],
+    floatDelay: "0.2s",
+    floatDur: "3.2s",
+    githubUrl: "https://github.com/MarmikShah634/universal-input-assistant",
+    liveUrl: "https://addons.mozilla.org/en-US/firefox/addon/universal-input-assistant/",
+    demoAvailable: true,
+    imageUrl: "/images/Universal_Input_Assistant.png",
+    videoUrl: "/videos/autocomplete_extension.mp4",
+  },
 ];
 
 interface Project {
