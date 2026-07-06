@@ -141,7 +141,7 @@ const PROJECTS = [
     },
     liveUrl: "https://crystal-billing-frontend.vercel.app/",
     demoAvailable: true,
-    imageUrl: "",
+    imageUrl: "/images/crystal_billing_thumbnail.png",
     videoUrl: "",
   },
 ];
