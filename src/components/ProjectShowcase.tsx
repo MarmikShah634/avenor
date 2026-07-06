@@ -115,6 +115,35 @@ const PROJECTS = [
     imageUrl: "/images/Universal_Input_Assistant.png",
     videoUrl: "/videos/autocomplete_extension.mp4",
   },
+  {
+    stacks: [
+      "React",
+      "TypeScript",
+      "Node.js",
+      "Express",
+      "MySQL",
+      "Tailwind",
+      "Redux Toolkit",
+    ],
+    name: "Crystal Billing",
+    desc: "A SaaS billing and operations platform for a diamond-cutting business (jagad order handling and party billing) in Surat — managing parties, orders with diamond lots, staff attendance, and PDF invoice generation.",
+    features: [
+      "Order management with dynamic diamond lots (carat, count, price per carat) and party/staff dropdowns",
+      "Billing module that generates per-party PDF invoices by date range, with invoice history and payment recording",
+      "Staff management with monthly attendance grid (Present/Absent/Half-day) and summary cards",
+      "Client-side reports & analytics dashboard — revenue by month, top parties, status breakdown, and KPIs",
+    ],
+    floatDelay: "0s",
+    floatDur: "3.4s",
+    githubUrl: {
+      frontend: "",
+      backend: "",
+    },
+    liveUrl: "https://crystal-billing-frontend.vercel.app/",
+    demoAvailable: true,
+    imageUrl: "",
+    videoUrl: "",
+  },
 ];
 
 interface Project {
