@@ -15,6 +15,7 @@ import ServicesGrid from './components/ServicesGrid';
 import ProcessTimeline from './components/ProcessTimeline';
 import ProjectShowcase from './components/ProjectShowcase';
 import AdvantageGrid from './components/AdvantageGrid';
+import Testimonials from './components/Testimonials';
 import ContactForm from './components/ContactForm';
 import Footer from './components/Footer';
 
@@ -90,6 +91,7 @@ export default function App() {
             <ProcessTimeline />
             <ProjectShowcase />
             <AdvantageGrid />
+            <Testimonials />
             <ContactForm />
           </main>
           

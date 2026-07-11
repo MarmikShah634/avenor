@@ -23,7 +23,8 @@ export default function Navigation({ onContactClick }: NavigationProps) {
     { name: 'Capabilities', href: '#capabilities' },
     { name: 'Pipeline', href: '#pipeline' },
     { name: 'Showcases', href: '#showcases' },
-    { name: 'Advantage', href: '#advantage' }
+    { name: 'Advantage', href: '#advantage' },
+    { name: 'Impact', href: '#testimonials' }
   ];
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
